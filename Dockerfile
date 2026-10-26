@@ -45,6 +45,9 @@ ENV PI_WEB_PORT=8787
 # docker compose down 即丢失全部会话与设置。compose 已挂 pi-web-data:/app/.pi-web。
 ENV PI_WEB_DATA_DIR=/app/.pi-web
 EXPOSE 8787
+# Pre-create the data dir owned by node so a fresh named volume inherits the
+# ownership; otherwise it initializes as root and the node user gets EACCES.
+RUN install -d -o node -g node /app/.pi-web
 # Session data (per-client chat history) lives here — mount a volume.
 VOLUME ["/app/.pi-web"]
 USER node
