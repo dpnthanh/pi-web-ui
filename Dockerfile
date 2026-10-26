@@ -50,4 +50,4 @@ VOLUME ["/app/.pi-web"]
 USER node
 # --import：pi SDK 副本选择钩子（issue #260/#321）——机器上有更新的 pi 就跟随，
 # 自带副本兜底；镜像内没有祖先副本，实际总是用自带那份。
-CMD ["node", "--import", "dist/server/resolve-global-sdk.js", "dist/server/index.js"]
+CMD ["node", "--import", "./dist/server/resolve-global-sdk.js", "./dist/server/index.js"]
