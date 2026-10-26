@@ -38,7 +38,7 @@ function pickRole(seg: string): CanvasNodeRole {
 /** “调研-编码-审查” / “先A再B然后C” / 换行 / 逗号分段 */
 function splitSteps(text: string): string[] {
 	return text
-		.split(/[\n；;。]+|[-–>→]+\s*|\s*(?:然后|接着|再|最后)\s*/g)
+		.split(/[\n；;。]+|[-–>→]+\s*|\s*(?:然后|接着|再|最后|then|next|after that|finally)\s*/gi)
 		.map((s) => s.trim())
 		.filter((s) => s.length > 0 && s.length < 80)
 		.slice(0, 12);
@@ -56,7 +56,7 @@ export function CanvasAiBar({ onApply, onSmartGenerate, smartPending, defaultMod
 		// 起始触发器
 		nodes.push({
 			id: `n_${now}_trigger`,
-			title: "开始",
+			title: "Start",
 			role: "trigger",
 			x: 80,
 			y: 80,
@@ -84,7 +84,7 @@ export function CanvasAiBar({ onApply, onSmartGenerate, smartPending, defaultMod
 				useWorktree: false,
 				status: "idle",
 			};
-			if (meta?.needsLlm) node.instruction = `${s}。参考{{上游摘要}}完成本步，输出结构化交付。`;
+			if (meta?.needsLlm) node.instruction = `${s}。Refer to {{upstream}} to complete this step and produce a structured deliverable.`;
 			const defaults: Record<string, string | number | boolean> = {};
 			for (const f of ROLE_FIELDS[role] ?? []) {
 				if (f.default !== undefined) defaults[f.key] = f.default;
@@ -109,7 +109,7 @@ export function CanvasAiBar({ onApply, onSmartGenerate, smartPending, defaultMod
 		}));
 		onApply({
 			id: `graph_${now}_${Math.random().toString(36).slice(2, 6)}`,
-			name: text.slice(0, 24) || "AI 生成流水线",
+			name: text.slice(0, 24) || "AI Pipeline",
 			viewport: { x: 60, y: 60, zoom: 1 },
 			nodes: laid,
 			edges,
@@ -123,8 +123,8 @@ export function CanvasAiBar({ onApply, onSmartGenerate, smartPending, defaultMod
 	};
 	if (!open) {
 		return (
-			<button type="button" className="canvas-ai-fab" onClick={() => setOpen(true)} title="一句话生成工作流">
-				✨ AI 生成
+			<button type="button" className="canvas-ai-fab" onClick={() => setOpen(true)} title="Generate a workflow from one sentence">
+				✨ AI Generate
 			</button>
 		);
 	}
@@ -137,11 +137,11 @@ export function CanvasAiBar({ onApply, onSmartGenerate, smartPending, defaultMod
 					if (e.key === "Enter") handleGenerate();
 					if (e.key === "Escape") setOpen(false);
 				}}
-				placeholder="例：先调研方案，再编码实现，然后测试，最后审查汇总"
+				placeholder="e.g., research options, then implement, then test, finally review & merge"
 				autoFocus
 			/>
 			<button type="button" className="canvas-btn primary" onClick={handleGenerate} disabled={!text.trim()}>
-				秒出
+				Instant
 			</button>
 			<button
 				type="button"
@@ -152,12 +152,12 @@ export function CanvasAiBar({ onApply, onSmartGenerate, smartPending, defaultMod
 					setText("");
 				}}
 				disabled={!text.trim() || smartPending}
-				title="发给当前对话的 AI，按需求智能拆工作流（回包确认后落图）"
+				title="Send to the current chat's AI to split the workflow smartly (applied after confirmation)"
 			>
-				{smartPending ? "等AI…" : "🤖智能"}
+				{smartPending ? "Waiting…" : "🤖Smart"}
 			</button>
 			<button type="button" className="canvas-btn" onClick={() => setOpen(false)}>
-				取消
+				Cancel
 			</button>
 		</div>
 	);

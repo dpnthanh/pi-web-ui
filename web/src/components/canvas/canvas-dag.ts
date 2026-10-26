@@ -18,11 +18,11 @@ interface ParsedDag {
 export function parseDagJson(raw: string): ParsedDag {
 	const data = JSON.parse(raw) as Partial<ParsedDag>;
 	if (!data || !Array.isArray(data.nodes) || data.nodes.length === 0 || data.nodes.length > 20) {
-		throw new Error("nodes 非法（需 1-20 个）");
+		throw new Error("invalid nodes (need 1-20)");
 	}
 	for (const n of data.nodes) {
 		if (!n || typeof n.title !== "string" || !VALID_ROLES.has(n.role)) {
-			throw new Error(`非法节点 role: ${(n as { role?: string })?.role}`);
+			throw new Error(`invalid node role: ${(n as { role?: string })?.role}`);
 		}
 	}
 	const edges = Array.isArray(data.edges) ? data.edges : [];
@@ -36,7 +36,7 @@ export function parseDagJson(raw: string): ParsedDag {
 			e.to >= data.nodes.length ||
 			e.from === e.to
 		) {
-			throw new Error("非法边下标");
+			throw new Error("invalid edge index");
 		}
 	}
 	// 环检测（DFS）
@@ -53,7 +53,7 @@ export function parseDagJson(raw: string): ParsedDag {
 		return false;
 	};
 	for (let i = 0; i < data.nodes.length; i++) {
-		if (color[i] === 0 && dfs(i)) throw new Error("DAG 含环，拒绝落图");
+		if (color[i] === 0 && dfs(i)) throw new Error("DAG contains a cycle; refusing to apply");
 	}
 	return { nodes: data.nodes, edges };
 }
@@ -101,7 +101,7 @@ export function dagToGraph(
 	const laid = layout(nodes, edges);
 	return {
 		id: `graph_${now}_${Math.random().toString(36).slice(2, 6)}`,
-		name: name.slice(0, 24) || "AI 智能流水线",
+		name: name.slice(0, 24) || "AI Pipeline",
 		viewport: { x: 60, y: 60, zoom: 1 },
 		nodes: laid,
 		edges,
@@ -116,10 +116,10 @@ export function dagToGraph(
 export function buildSmartPrompt(userAsk: string): string {
 	const roles = Object.keys(ROLE_METAS).join(", ");
 	return [
-		"【画布工作流生成】请把下面的需求拆成工作流节点，只输出一个 ```canvas-dag JSON 块，不要其他解释。",
-		`可用 role（必须严格使用）：${roles}。`,
-		"常用：researcher 调研 / planner 规划 / architect 架构 / coder 编码 / tester 测试 / reviewer 审查 / writer 文档 / human 人工审批 / condition 条件分支 / loop 循环 / merge 汇总 / trigger 开始 / end 结束。",
-		'JSON 格式：{"nodes":[{"title":"步骤名","role":"coder","instruction":"给该节点的执行指令"}],"edges":[{"from":0,"to":1}]}，nodes 1-12 个，edges 下标引用 nodes，禁止成环。',
-		`需求：${userAsk}`,
+		"[Canvas workflow generation] Split the requirement below into workflow nodes. Output only one ```canvas-dag JSON block, no other explanation.",
+		`Available roles (use exactly): ${roles}.`,
+		"Common: researcher / planner / architect / coder / tester / reviewer / writer / human approval / condition branch / loop / merge / trigger start / end.",
+		'JSON format: {"nodes":[{"title":"Step name","role":"coder","instruction":"Execution instruction for the node"}],"edges":[{"from":0,"to":1}]}; 1-12 nodes, edges reference node indexes, no cycles.',
+		`Requirement: ${userAsk}`,
 	].join("\n");
 }

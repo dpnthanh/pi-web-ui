@@ -50,7 +50,7 @@ interface CanvasNodeCardProps {
 	onPortPositions?: (nodeId: string, positions: Record<string, number>) => void;
 	/** 已连线的端子（高亮用）：{ in: [targetPort...], out: [sourcePort...] } */
 	activePorts?: { in: string[]; out: string[] };
-	/** 上游连线已沉淀的交付摘要（结束/汇聚节点用来展示收到的输出） */
+	/** 上游连线已沉淀的交付摘要（结束/汇聚节点用来展示Received Output） */
 	incomingPreview?: string;
 }
 
@@ -122,11 +122,11 @@ export function CanvasNodeCard({
 	const isAgent = roleNeedsInstruction(node.role);
 	const inPortTip = (key: string) => {
 		const def = IN_PORT_DEFS.find((d) => d.key === key);
-		return "输入端子 · " + (def ? def.labelZh + " — " + def.desc : key);
+		return "Input port · " + (def ? def.labelZh + " — " + def.desc : key);
 	};
 	const outPortTip = (key: string) => {
 		const def = outPortsForRole(node.role).find((d) => d.key === key);
-		return "输出端子 · " + (def ? def.labelZh + " — " + def.desc : key);
+		return "Output port · " + (def ? def.labelZh + " — " + def.desc : key);
 	};
 
 	const setCfg = (patch: Record<string, string | number | boolean>) =>
@@ -230,7 +230,7 @@ export function CanvasNodeCard({
 		if (fields.length === 0) return null;
 		return (
 			<div className="canvas-node-field-col">
-				<span className="canvas-field-label">角色专属参数</span>
+				<span className="canvas-field-label">Role Params</span>
 				{fields.map((f) => renderRoleField(f))}
 			</div>
 		);
@@ -347,7 +347,7 @@ export function CanvasNodeCard({
 						value={node.title}
 						onChange={(e) => onUpdate(node.id, { title: e.target.value })}
 						onClick={(e) => e.stopPropagation()}
-						title="点击修改队友名称"
+						title="Click to rename"
 					/>
 				</div>
 
@@ -366,12 +366,12 @@ export function CanvasNodeCard({
 
 			{/* 节点配置面板：引擎、模型、目录 */}
 			<div className="canvas-node-body">
-				{/* 通用节点类型（对标 LangGraph/n8n 前沿范式） */}
+				{/* 通用Node Type（对标 LangGraph/n8n 前沿范式） */}
 				<div className="canvas-node-field-row">
 					<span className="canvas-field-label">
-						节点类型
+						Node Type
 						<span
-							title={`输入：${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).input}\n输出：${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).output}\n用法：${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).usage}`}
+							title={`Input: ${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).input}\nOutput: ${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).output}\nUsage: ${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).usage}`}
 							style={{
 								display: "inline-flex",
 								alignItems: "center",
@@ -411,16 +411,16 @@ export function CanvasNodeCard({
 							style={{
 								borderColor: hasIncoming ? "var(--accent)" : "var(--border)",
 							}}
-							title="输入端子 · 任务契约（主输入）：拖入连线，上游交付产物将作为任务契约注入本节点"
+							title="Input port · task contract (main): drop an edge here; the upstream deliverable is injected as the task contract"
 							data-cport="contract"
 							onPointerUp={(e) => handleInUp(e, "contract")}
 						>
 							<span className="canvas-port-dot" />
 						</div>
-						输入(input)
+						Input
 					</span>
 					<span className="canvas-muted-note">
-						{hasIncoming || (activePorts?.in.length ?? 0) > 0 ? "已连接上游" : "未连接"}
+						{hasIncoming || (activePorts?.in.length ?? 0) > 0 ? "Connected" : "Not connected"}
 					</span>
 				</div>
 
@@ -436,15 +436,15 @@ export function CanvasNodeCard({
 							>
 								<span className="canvas-row-port-dot" />
 							</div>
-							AI 指令 (可输入·随图保存)
+							AI Instruction (editable, saved with graph)
 						</span>
 						<textarea
 							className="canvas-instruction-input"
 							rows={3}
 							value={node.instruction || ""}
 							onChange={(e) => onUpdate(node.id, { instruction: e.target.value })}
-							placeholder="留空=直接使用输入；或例：按输入完成开发 {{input}}…"
-							title={"留空或只写 {{input}} = 直接使用上游输入；也可用 {{上游摘要}} / {{upstream}} 变量"}
+							placeholder="Empty = use input as-is; e.g., finish the development per the input {{input}}…"
+							title={"Empty or just {{input}} = use the upstream input; the {{upstream}} variable is also supported"}
 						/>
 					</div>
 				) : null}
@@ -459,15 +459,15 @@ export function CanvasNodeCard({
 							>
 								<span className="canvas-row-port-dot" />
 							</div>
-							角色规约
+							Role Spec
 						</span>
 						<textarea
 							className="canvas-instruction-input"
 							rows={3}
 							value={node.systemPromptOverride || ""}
 							onChange={(e) => onUpdate(node.id, { systemPromptOverride: e.target.value })}
-							placeholder="该节点的基座人设，可多行输入…"
-							title="基座人设（System Prompt），可直接输入；详情在抽屉中编辑"
+							placeholder="Base persona for this node (multiline)…"
+							title="Base persona (system prompt); edit details in the drawer"
 						/>
 					</div>
 				)}
@@ -477,23 +477,23 @@ export function CanvasNodeCard({
 					<>
 						<div className="canvas-node-field-row">
 							<span className="canvas-field-label">
-								<FiCpu /> 引擎底座
+								<FiCpu /> Engine
 							</span>
 							<select
 								className="canvas-select"
 								value={node.engine}
 								onChange={(e) => onUpdate(node.id, { engine: e.target.value as CanvasEngineId })}
 							>
-								<option value="pi">Pi 原生</option>
-								<option value="dsh">DSH 极速</option>
+								<option value="pi">Pi Native</option>
+								<option value="dsh">DSH Turbo</option>
 								<option value="claude">Claude Code</option>
-								<option value="durable">Durable 自愈</option>
+								<option value="durable">Durable Self-Healing</option>
 							</select>
 						</div>
 
-						{/* 模型与思考强度胶囊（直接复用主对话通用 ModelThinking 组件） */}
+						{/* Model & Thinking胶囊（直接复用主对话通用 ModelThinking 组件） */}
 						<div className="canvas-node-field-col">
-							<span className="canvas-field-label">模型与思考强度</span>
+							<span className="canvas-field-label">Model & Thinking</span>
 							<ModelThinking
 								state={{
 									model: selectedModelObj,
@@ -513,7 +513,7 @@ export function CanvasNodeCard({
 
 						{/* 工作目录选择与本地浏览（直接复用通用 UniversalPathPicker 组件） */}
 						<div className="canvas-node-field-col">
-							<span className="canvas-field-label">工作区目录</span>
+							<span className="canvas-field-label">Workspace Dir</span>
 							<UniversalPathPicker
 								cwd={node.cwd}
 								onSelectCwd={(c) => onUpdate(node.id, { cwd: c })}
@@ -541,8 +541,8 @@ export function CanvasNodeCard({
 									className={`canvas-checkbox-row ${isRemote ? "disabled" : ""}`}
 									title={
 										isRemote
-											? "远程 SSH 工作区项目直接在目标远端执行，不走本地 Git Worktree"
-											: "为该数字员工拉取独立的 Git Worktree 沙箱，避免文件并发冲突"
+											? "Remote SSH workspaces execute on the remote host directly — no local Git Worktree"
+											: "Give this agent an isolated Git Worktree sandbox to avoid concurrent file conflicts"
 									}
 								>
 									<input
@@ -552,8 +552,8 @@ export function CanvasNodeCard({
 										onChange={(e) => onUpdate(node.id, { useWorktree: e.target.checked })}
 									/>
 									<span className="canvas-checkbox-label">
-										<FiGitBranch /> 启用独立 Git Worktree 物理隔离
-										{isRemote && <small style={{ opacity: 0.65, marginLeft: 4 }}>(远程环境免隔离)</small>}
+										<FiGitBranch /> Isolated Git Worktree
+										{isRemote && <small style={{ opacity: 0.65, marginLeft: 4 }}>(no isolation on remote)</small>}
 									</span>
 								</label>
 							);
@@ -583,24 +583,24 @@ export function CanvasNodeCard({
 				)}
 				{/* 结束/汇聚节点：把上游连线沉淀的交付摘要直接展示出来 */}
 				{(node.role === "end" || node.role === "merge") && (
-					<div className="canvas-node-field-col" title={incomingPreview || "暂无上游输入"}>
-						<span className="canvas-field-label">收到的输出</span>
+					<div className="canvas-node-field-col" title={incomingPreview || "No upstream input yet"}>
+						<span className="canvas-field-label">Received Output</span>
 						<span className="canvas-muted-note canvas-output-preview">
 							{incomingPreview
 								? incomingPreview.slice(0, 120) + (incomingPreview.length > 120 ? "…" : "")
-								: "暂无上游输入"}
+								: "No upstream input yet"}
 						</span>
 					</div>
 				)}
-				{/* 输出内容提示：期望输出 + 实际产物预览（悬停看全文） */}
+				{/* Output提示：期望输出 + 实际产物预览（悬停看全文） */}
 				<div
 					className="canvas-node-field-col"
 					title={
 						node.status === "error" && node.error
-							? `执行出错：${node.error}`
+							? `Error: ${node.error}`
 							: node.lastOutputSummary
 								? node.lastOutputSummary
-								: `该节点将输出：${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).output}`
+								: `Will output: ${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).output}`
 					}
 				>
 					<span className="canvas-field-label">
@@ -609,7 +609,7 @@ export function CanvasNodeCard({
 							style={{
 								borderColor: engineMeta.color,
 							}}
-							title="输出端子 · 交付产物（主输出）：按住拖拽连线至目标节点的某个输入端子"
+							title="Output port · deliverable (main): drag to an input port on the target node"
 							data-cport="result"
 							onPointerDown={(e) => handleOutDown(e, "result")}
 						>
@@ -620,18 +620,18 @@ export function CanvasNodeCard({
 								}}
 							/>
 						</div>
-						输出内容
+						Output
 					</span>
 					{/* 出错时优先显示本轮真实报错，不挂上一次遗留的「交付完成」 */}
 					{node.status === "error" && node.error ? (
 						<span className="canvas-muted-note canvas-output-preview canvas-output-error">
-							{`执行出错：${node.error}`.slice(0, 120)}
+							{`Error: ${node.error}`.slice(0, 120)}
 						</span>
 					) : (
 						<span className="canvas-muted-note canvas-output-preview">
 							{node.lastOutputSummary
 								? node.lastOutputSummary.slice(0, 120) + (node.lastOutputSummary.length > 120 ? "…" : "")
-								: `将输出：${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).output}`}
+								: `Will output: ${(ROLE_IO_HELP[node.role] ?? ROLE_IO_HELP.custom).output}`}
 						</span>
 					)}
 				</div>
@@ -647,14 +647,14 @@ export function CanvasNodeCard({
 					<span className="canvas-status-text">
 						{node.currentAction ||
 							(node.status === "idle"
-								? "待命中"
+								? "Idle"
 								: node.status === "running"
-									? "执行中"
+									? "Running"
 									: node.status === "waiting_approval"
-										? "待人工审批"
+										? "Awaiting approval"
 										: node.status === "done"
-											? "任务交付完成"
-											: "执行出错")}
+											? "Delivered"
+											: "Error")}
 					</span>
 				</div>
 			</div>
@@ -665,44 +665,44 @@ export function CanvasNodeCard({
 					<button
 						type="button"
 						className="canvas-btn stop"
-						title="中止执行"
+						title="Abort"
 						onClick={(e) => {
 							e.stopPropagation();
 							onStop(node.id);
 						}}
 					>
-						<FiSquare /> 停止
+						<FiSquare /> Stop
 					</button>
 				) : (
 					<button
 						type="button"
 						className="canvas-btn run"
-						title="启动该节点"
+						title="Run this node"
 						onClick={(e) => {
 							e.stopPropagation();
 							onRun(node.id);
 						}}
 					>
-						<FiPlay /> 启动
+						<FiPlay /> Run
 					</button>
 				)}
 
 				<button
 					type="button"
 					className="canvas-btn"
-					title="打开审查与深控抽屉"
+					title="Open review & control drawer"
 					onClick={(e) => {
 						e.stopPropagation();
 						onOpenDrawer(node.id);
 					}}
 				>
-					<FiSliders /> 审查/插话
+					<FiSliders /> Review/Steer
 				</button>
 
 				<button
 					type="button"
 					className="canvas-btn del"
-					title="删除此节点"
+					title="Delete node"
 					onClick={(e) => {
 						e.stopPropagation();
 						onDelete(node.id);

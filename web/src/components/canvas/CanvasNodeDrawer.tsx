@@ -86,7 +86,7 @@ export function CanvasNodeDrawer({
 	const [logTab, setLogTab] = useState<"chat" | "events">("chat");
 	const logScrollRef = useRef<HTMLDivElement | null>(null);
 
-	// 支持按 Escape 键关闭抽屉（必须放在顶部，保证 Hook 调用数量恒定）
+	// 支持按 Escape 键Close抽屉（必须放在顶部，保证 Hook 调用数量恒定）
 	const emptyMap: ReadonlyMap<string, never> = new Map<string, never>();
 	const emptyToolStatuses: ReadonlyMap<string, any> = new Map();
 	const drawerCfg = ((node?.config ?? {}) as Record<string, string | number | boolean | undefined>) || {};
@@ -277,7 +277,7 @@ export function CanvasNodeDrawer({
 						</div>
 					</div>
 
-					<button type="button" className="canvas-drawer-close" onClick={onClose} title="关闭抽屉">
+					<button type="button" className="canvas-drawer-close" onClick={onClose} title="Close drawer">
 						<FiX />
 					</button>
 				</div>
@@ -286,9 +286,9 @@ export function CanvasNodeDrawer({
 				<div className="canvas-drawer-body">
 					{roleNeedsInstruction(node.role) && (
 						<>
-							{/* 模型与思考强度配置（通用 ModelThinking 控件） */}
+							{/* Model & Thinking配置（通用 ModelThinking 控件） */}
 							<div className="canvas-drawer-section">
-								<h4 className="canvas-section-title">模型选择与思考强度 (Model & Thinking)</h4>
+								<h4 className="canvas-section-title">Model & Thinking</h4>
 								<ModelThinking
 									state={{
 										model: selectedModelObj,
@@ -308,7 +308,7 @@ export function CanvasNodeDrawer({
 
 							{/* 环境与物理目录（通用 UniversalPathPicker 控件） */}
 							<div className="canvas-drawer-section">
-								<h4 className="canvas-section-title">工作区沙箱环境</h4>
+								<h4 className="canvas-section-title">Workspace Sandbox</h4>
 								<UniversalPathPicker
 									cwd={node.cwd}
 									onSelectCwd={(c) => onUpdate(node.id, { cwd: c })}
@@ -334,8 +334,8 @@ export function CanvasNodeDrawer({
 											style={{ marginTop: "8px" }}
 											title={
 												isRemote
-													? "远程 SSH 工作区项目直接在目标远端执行，不走本地 Git Worktree"
-													: "为该数字员工拉取独立的 Git Worktree 沙箱，避免文件并发冲突"
+													? "Remote SSH workspaces execute on the remote host directly — no local Git Worktree"
+													: "Give this agent an isolated Git Worktree sandbox to avoid concurrent file conflicts"
 											}
 										>
 											<input
@@ -345,8 +345,8 @@ export function CanvasNodeDrawer({
 												onChange={(e) => onUpdate(node.id, { useWorktree: e.target.checked })}
 											/>
 											<span className="canvas-checkbox-label">
-												<FiGitBranch /> 启用独立 Git Worktree 物理隔离 (.worktrees/canvas-{node.id})
-												{isRemote && <small style={{ opacity: 0.65, marginLeft: 4 }}>(远程环境免隔离)</small>}
+												<FiGitBranch /> Isolated Git Worktree (.worktrees/canvas-{node.id})
+												{isRemote && <small style={{ opacity: 0.65, marginLeft: 4 }}>(no isolation on remote)</small>}
 											</span>
 										</label>
 									);
@@ -355,17 +355,17 @@ export function CanvasNodeDrawer({
 
 							{/* 角色职责与 System Prompt（基座人设） */}
 							<div className="canvas-drawer-section">
-								<h4 className="canvas-section-title">角色指令规约 (System Prompt)</h4>
+								<h4 className="canvas-section-title">Role Spec (System Prompt)</h4>
 								<textarea
 									className="canvas-drawer-textarea"
 									rows={5}
 									value={node.systemPromptOverride || ""}
 									onChange={(e) => onUpdate(node.id, { systemPromptOverride: e.target.value })}
-									placeholder="输入该数字员工的专属职责人设（基座），与下方「任务指令」配合使用…"
+									placeholder="Define this agent's base persona; works together with the task instruction below…"
 								/>
 								<p className="canvas-tip">
-									基座人设×任务指令双轨制：人设决定“是谁”，任务指令决定“做什么”。启动优先级：本次手动输入 &gt; 节点 AI
-									指令 &gt; 角色规约。
+									Dual track: the persona defines WHO the agent is, the instruction defines WHAT to do. Launch priority: manual input &gt; node AI
+									instruction &gt; role spec.
 								</p>
 							</div>
 						</>
@@ -374,16 +374,16 @@ export function CanvasNodeDrawer({
 					{/* AI 任务指令（可输入）：LLM 型节点显示 */}
 					{roleNeedsInstruction(node.role) && (
 						<div className="canvas-drawer-section">
-							<h4 className="canvas-section-title canvas-instruction-title">AI 任务指令 (可输入·随图保存)</h4>
+							<h4 className="canvas-section-title canvas-instruction-title">Task Instruction (editable, saved with graph)</h4>
 							<textarea
 								className="canvas-drawer-textarea canvas-instruction-textarea"
 								rows={6}
 								value={node.instruction || ""}
 								onChange={(e) => onUpdate(node.id, { instruction: e.target.value })}
-								placeholder="留空=直接使用输入；或例：按照 PRD 完成登录页 {{input}}…"
+								placeholder="Empty = use input as-is; e.g., implement the login page per the PRD {{input}}…"
 							/>
 							<p className="canvas-tip">
-								{"支持变量：{{input}} / {{上游摘要}} / {{upstream}} 引用上游输入；留空 = 直接使用输入。"}
+								{"Variables: {{input}} / {{upstream}} reference upstream input; empty = use input as-is."}
 							</p>
 						</div>
 					)}
@@ -391,7 +391,7 @@ export function CanvasNodeDrawer({
 					{/* 通用工作流控制参数：条件 / 循环 / 审批 / 工具 / API 等 */}
 					{visibleRoleFields(node.role, drawerCfg).length > 0 && (
 						<div className="canvas-drawer-section">
-							<h4 className="canvas-section-title">节点控制参数</h4>
+							<h4 className="canvas-section-title">Control Params</h4>
 							{visibleRoleFields(node.role, drawerCfg).map((f) => renderDrawerField(f))}
 						</div>
 					)}
@@ -399,7 +399,7 @@ export function CanvasNodeDrawer({
 					{/* 上游任务契约 (Incoming Contracts) */}
 					{incomingEdges.length > 0 && (
 						<div className="canvas-drawer-section">
-							<h4 className="canvas-section-title">上游前置契约 (Incoming Contracts)</h4>
+							<h4 className="canvas-section-title">Incoming Contracts</h4>
 							<div className="canvas-contract-list">
 								{incomingEdges.map((edge) => {
 									const sourceNode = nodeMap.get(edge.sourceNodeId);
@@ -407,7 +407,7 @@ export function CanvasNodeDrawer({
 										<div key={edge.id} className="canvas-contract-card">
 											<div className="canvas-contract-header">
 												<span>
-													来源: <b>{sourceNode?.title || edge.sourceNodeId}</b>
+													From: <b>{sourceNode?.title || edge.sourceNodeId}</b>
 												</span>
 												<span className="canvas-contract-type">{edge.type}</span>
 											</div>
@@ -416,7 +416,7 @@ export function CanvasNodeDrawer({
 													{outPortLabel(edge.sourcePort)} → {inPortLabel(edge.targetPort)}
 												</span>
 												<label>
-													接入本节点端子
+													Target port on this node
 													<select
 														className="canvas-select"
 														value={edge.targetPort || "contract"}
@@ -431,7 +431,7 @@ export function CanvasNodeDrawer({
 												</label>
 											</div>
 											<div className="canvas-contract-content">
-												{edge.lastHandoffSummary || "（等待上游完成交付后自动注入）"}
+												{edge.lastHandoffSummary || "(auto-injected when upstream delivers)"}
 											</div>
 										</div>
 									);
@@ -440,10 +440,10 @@ export function CanvasNodeDrawer({
 						</div>
 					)}
 
-					{/* 下游交接 (Outgoing Handoffs)：本节点各输出端子的连线 */}
+					{/* Outgoing Handoffs：本节点各输出端子的连线 */}
 					{outgoingEdges.length > 0 && (
 						<div className="canvas-drawer-section">
-							<h4 className="canvas-section-title">下游交接 (Outgoing Handoffs)</h4>
+							<h4 className="canvas-section-title">Outgoing Handoffs</h4>
 							<div className="canvas-contract-list">
 								{outgoingEdges.map((edge) => {
 									const targetNode = nodeMap.get(edge.targetNodeId);
@@ -451,7 +451,7 @@ export function CanvasNodeDrawer({
 										<div key={edge.id} className="canvas-contract-card">
 											<div className="canvas-contract-header">
 												<span>
-													去向: <b>{targetNode?.title || edge.targetNodeId}</b>
+													To: <b>{targetNode?.title || edge.targetNodeId}</b>
 													<small className="canvas-port-tag">
 														{outPortLabel(edge.sourcePort)} → {inPortLabel(edge.targetPort)}
 													</small>
@@ -460,7 +460,7 @@ export function CanvasNodeDrawer({
 											</div>
 											<div className="canvas-contract-ports">
 												<label>
-													本节点输出端子
+													Output port on this node
 													<select
 														className="canvas-select"
 														value={edge.sourcePort || "result"}
@@ -498,19 +498,19 @@ export function CanvasNodeDrawer({
 
 					{/* 任务交付物与审查门禁 (Review Gate) */}
 					<div className="canvas-drawer-section">
-						<h4 className="canvas-section-title">任务交付与审查门禁 (Review Gate)</h4>
+						<h4 className="canvas-section-title">Delivery & Review Gate</h4>
 						<div className="canvas-review-gate-box">
 							<div className="canvas-review-status-row">
-								<span>当前状态：</span>
+								<span>Status: </span>
 								<b className={`status-badge status-${node.status}`}>{node.status.toUpperCase()}</b>
 							</div>
 							<div className="canvas-summary-box">
 								{node.status === "error" && node.error ? (
 									<div>
-										<p className="canvas-summary-text canvas-summary-error">执行失败：{node.error}</p>
+										<p className="canvas-summary-text canvas-summary-error">Failed: {node.error}</p>
 										<div className="canvas-review-actions">
 											<button type="button" className="canvas-btn green" onClick={() => onRun(node.id)}>
-												<FiPlay /> 重跑本节点
+												<FiPlay /> Re-run node
 											</button>
 										</div>
 									</div>
@@ -528,7 +528,7 @@ export function CanvasNodeDrawer({
 													border: "1px solid color-mix(in srgb, var(--amber, #f59e0b) 30%, transparent)",
 												}}
 											>
-												⚠️ 节点正在执行新任务中，以下为上一轮产出摘要。执行完成前不可裁决。
+												⚠️ Node is running a new task; below is the previous round's summary. No verdict until it finishes.
 											</div>
 										) : null}
 										<p className="canvas-summary-text">{node.lastOutputSummary}</p>
@@ -541,10 +541,10 @@ export function CanvasNodeDrawer({
 												onClick={() => {
 													if (node.status === "running") return;
 													if (onReview) onReview(node.id, "approve");
-													else onUpdate(node.id, { status: "done", currentAction: "人工审查批准合流" });
+													else onUpdate(node.id, { status: "done", currentAction: "Approved by human review" });
 												}}
 											>
-												<FiCheckCircle /> 审查通过并批准
+												<FiCheckCircle /> Approve & merge
 											</button>
 											<button
 												type="button"
@@ -557,16 +557,16 @@ export function CanvasNodeDrawer({
 													else
 														onUpdate(node.id, {
 															status: "waiting_approval",
-															currentAction: "人工驳回：需补充完善测试与注释",
+															currentAction: "Rejected: needs more tests and docs",
 														});
 												}}
 											>
-												<FiAlertCircle /> 驳回修改
+												<FiAlertCircle /> Reject & rework
 											</button>
 										</div>
 									</div>
 								) : (
-									<span className="canvas-text-muted">暂无交付物产出，等待节点执行完成。</span>
+									<span className="canvas-text-muted">No deliverable yet — waiting for the node to finish.</span>
 								)}
 							</div>
 						</div>
@@ -574,35 +574,35 @@ export function CanvasNodeDrawer({
 
 					{/* 运行中实时插话干预 (Steer Console) */}
 					<div className="canvas-drawer-section">
-						<h4 className="canvas-section-title">实时插话干预 (Steer)</h4>
-						<p className="canvas-tip">数字员工在后台干活时，你随时可以敲字发指令插话纠偏，信息会直接投递进当前会话。</p>
-						{/* 对话实录：复用主对话流 + 协同事件，调用/错误/协同清晰可见 */}
+						<h4 className="canvas-section-title">Live Steer</h4>
+						<p className="canvas-tip">While the agent works in the background you can type instructions anytime to steer it; messages go straight into the live session.</p>
+						{/* Session Transcript：复用主对话流 + 协同事件，调用/错误/协同清晰可见 */}
 						<div className="canvas-drawer-section canvas-log-section">
 							<div className="canvas-log-header">
-								<h4 className="canvas-section-title">对话实录</h4>
+								<h4 className="canvas-section-title">Session Transcript</h4>
 								<div className="canvas-log-tabs">
 									<button
 										type="button"
 										className={"canvas-log-tab " + (logTab === "chat" ? "active" : "")}
 										onClick={() => setLogTab("chat")}
-										title="复用主对话流的消息"
+										title="Messages reused from the main chat stream"
 									>
-										<FiMessageSquare /> 对话 {logMessages.length ? "(" + logMessages.length + ")" : ""}
+										<FiMessageSquare /> Chat {logMessages.length ? "(" + logMessages.length + ")" : ""}
 									</button>
 									<button
 										type="button"
 										className={"canvas-log-tab " + (logTab === "events" ? "active" : "")}
 										onClick={() => setLogTab("events")}
-										title="调用/错误/协同事件"
+										title="Tool/error/collaboration events"
 									>
-										<FiActivity /> 事件 {logEntries.length ? "(" + logEntries.length + ")" : ""}
+										<FiActivity /> Events {logEntries.length ? "(" + logEntries.length + ")" : ""}
 									</button>
 									{(logEntries.length > 0 || logMessages.length > 0) && onClearLog && (
 										<button
 											type="button"
 											className="canvas-log-clear"
 											onClick={() => onClearLog(node.id)}
-											title="清空对话实录"
+											title="Clear transcript"
 										>
 											<FiTrash2 />
 										</button>
@@ -613,7 +613,7 @@ export function CanvasNodeDrawer({
 								{logTab === "chat" ? (
 									logMessages.length === 0 ? (
 										<span className="canvas-text-muted">
-											暂无对话消息：启动节点后，这里复用主对话流实时显示每一轮调用与回复。
+											No messages yet: run the node and every call/reply streams here in real time.
 										</span>
 									) : (
 										logMessages.slice(-100).map((m) => (
@@ -631,7 +631,7 @@ export function CanvasNodeDrawer({
 										))
 									)
 								) : logEntries.length === 0 ? (
-									<span className="canvas-text-muted">暂无协同事件：工具调用、报错、插话与交接都会记在这里。</span>
+									<span className="canvas-text-muted">No events yet: tool calls, errors, steers and handoffs are recorded here.</span>
 								) : (
 									logEntries.slice(-200).map((e) => (
 										<div key={e.id} className={"canvas-log-entry kind-" + e.kind}>
@@ -648,14 +648,14 @@ export function CanvasNodeDrawer({
 							<input
 								type="text"
 								className="canvas-steer-input"
-								placeholder="输入实时纠偏意见 (如: 别修改 styles.css，只在组件内局部改动)..."
+								placeholder="Type a live correction (e.g., don't touch styles.css, keep changes local to the component)..."
 								value={steerInput}
 								onChange={(e) => setSteerInput(e.target.value)}
 								onKeyDown={(e) => {
 									if (e.key === "Enter") handleSendSteer();
 								}}
 							/>
-							<button type="button" className="canvas-steer-btn" onClick={handleSendSteer} title="发送插话">
+							<button type="button" className="canvas-steer-btn" onClick={handleSendSteer} title="Send steer">
 								<FiSend />
 							</button>
 						</div>
@@ -666,15 +666,15 @@ export function CanvasNodeDrawer({
 				<div className="canvas-drawer-footer">
 					{node.status === "running" ? (
 						<button type="button" className="canvas-btn stop" onClick={() => onStop(node.id)}>
-							<FiSquare /> 停止当前任务
+							<FiSquare /> Stop Current Task
 						</button>
 					) : (
 						<button type="button" className="canvas-btn run" onClick={() => onRun(node.id)}>
-							<FiPlay /> 启动该节点
+							<FiPlay /> Run Node
 						</button>
 					)}
 					<button type="button" className="canvas-btn" onClick={onClose}>
-						关闭
+						Close
 					</button>
 				</div>
 			</div>

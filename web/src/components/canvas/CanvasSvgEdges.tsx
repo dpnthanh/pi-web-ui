@@ -103,7 +103,7 @@ export function CanvasSvgEdges({
 					>
 						{/* 加粗透明命中区域，方便鼠标交互 */}
 						<path d={d} fill="none" stroke="transparent" strokeWidth="20" className="canvas-edge-hitbox">
-							<title>双击写备注，悬停显示删除按钮</title>
+							<title>Double-click to add a note; hover to reveal delete</title>
 						</path>
 
 						{/* 运行中外光晕层 */}
@@ -150,7 +150,7 @@ export function CanvasSvgEdges({
 								<div
 									className="canvas-edge-badge"
 									style={hasEdgeLabel || isEditingEdge ? undefined : { justifyContent: "center", padding: "2px 4px" }}
-									title={edge.label && edge.label.trim() ? undefined : "双击写备注，× 删除连线"}
+									title={edge.label && edge.label.trim() ? undefined : "Double-click to add a note; × deletes the edge"}
 									onDoubleClick={(e) => {
 										if ((e.target as HTMLElement).closest("button,input")) return;
 										e.stopPropagation();
@@ -173,7 +173,7 @@ export function CanvasSvgEdges({
 											onClick={(e) => e.stopPropagation()}
 											onPointerDown={(e) => e.stopPropagation()}
 											onDoubleClick={(e) => e.stopPropagation()}
-											placeholder="写备注…"
+											placeholder="Add a note…"
 										/>
 									) : edge.label && edge.label.trim() ? (
 										<span
@@ -199,7 +199,7 @@ export function CanvasSvgEdges({
 										<button
 											type="button"
 											className="canvas-edge-del"
-											title="删除此连线"
+											title="Delete this edge"
 											onClick={(e) => {
 												e.stopPropagation();
 												onDeleteEdge(edge.id);

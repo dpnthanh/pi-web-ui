@@ -64,7 +64,7 @@ export function CanvasStudio({
 	const [graph, setGraph] = useState<CanvasGraph>(() => SQUAD_TEMPLATES[0].createGraph());
 	const graphRef = useRef(graph);
 	graphRef.current = graph;
-	/** 当前工程 id 镜像：canvas_node_event 按 graphId 过滤，跨工程事件直接丢弃（#706） */
+	/** 当前工程 id 镜像：canvas_node_event 按 graphId 过滤，跨工程事件直接Discard（#706） */
 	const graphIdRef = useRef(graph.id);
 	graphIdRef.current = graph.id;
 	const [graphList, setGraphList] = useState<CanvasGraphSummary[]>([]);
@@ -214,7 +214,7 @@ export function CanvasStudio({
 				setViewport(msg.graph.viewport);
 			}
 		} else if (msg.type === "canvas_node_event") {
-			// 跨工程事件隔离：只处理当前画布工程的节点事件，非同工程直接丢弃（#706）
+			// 跨工程事件隔离：只处理当前画布工程的节点事件，非同工程直接Discard（#706）
 			if (msg.graphId !== graphIdRef.current) return;
 			const { nodeId, currentAction, summary, error } = msg;
 			setGraph((prev) => {
@@ -367,7 +367,7 @@ export function CanvasStudio({
 			return;
 		}
 
-		// 点击空白区域取消节点选中
+		// 点击空白区域Cancel节点选中
 		setSelectedNodeId(null);
 
 		setIsPanning(true);
@@ -504,10 +504,10 @@ export function CanvasStudio({
 			try {
 				const parsed = parseDagJson(raw);
 				setSmartDag({
-					graph: dagToGraph(parsed, "AI 智能流水线", resolveNodeModel(""), autoLayout, currentCwd || "."),
+					graph: dagToGraph(parsed, "AI Pipeline", resolveNodeModel(""), autoLayout, currentCwd || "."),
 				});
 			} catch (e) {
-				setSmartDag({ graph, error: e instanceof Error ? e.message : "DAG 解析失败" });
+				setSmartDag({ graph, error: e instanceof Error ? e.message : "DAG parse failed" });
 			}
 			setSmartPending(false);
 			break;
@@ -523,7 +523,7 @@ export function CanvasStudio({
 			const nid = "n_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
 			const newNode: CanvasNode = {
 				id: nid,
-				title: meta ? meta.labelZh : "队友 " + (graph.nodes.length + 1),
+				title: meta ? meta.labelZh : "Teammate " + (graph.nodes.length + 1),
 				role: role,
 				x: Math.round(-viewport.x / viewport.zoom + 300 + Math.random() * 100),
 				y: Math.round(-viewport.y / viewport.zoom + 200 + Math.random() * 100),
@@ -607,7 +607,7 @@ export function CanvasStudio({
 		return map;
 	}, [graph.nodes, graph.edges]);
 
-	// 每个节点的上游交付摘要（结束/汇聚卡片用来展示收到的输出）
+	// 每个节点的上游交付摘要（结束/汇聚卡片用来展示Received Output）
 	const incomingPreviewByNode = useMemo(() => {
 		const map = new Map<string, string>();
 		for (const e of graph.edges) {
@@ -631,7 +631,7 @@ export function CanvasStudio({
 		[graph, pushHistory],
 	);
 
-	// P2：导出 PNG / JSON / 导入 JSON
+	// P2：导出 PNG / JSON / Import JSON
 	const exportRef = useRef<HTMLDivElement>(null);
 	const handleExportJSON = useCallback(() => {
 		const blob = new Blob([JSON.stringify(graph, null, 2)], { type: "application/json" });
@@ -689,13 +689,13 @@ export function CanvasStudio({
 			id: nid,
 			x: src.x + 40,
 			y: src.y + 40,
-			title: src.title + " 副本",
+			title: src.title + " copy",
 			status: "idle",
 		};
 		setGraph((p) => ({ ...p, nodes: [...p.nodes, copy], updatedAt: Date.now() }));
 		setSelectedNodeId(nid);
 	}, [graph, selectedNodeId, pushHistory]);
-	// 一键自动布局
+	// Auto-layout
 	const handleAutoLayout = useCallback(() => {
 		pushHistory(graph);
 		setGraph((p) => ({ ...p, nodes: autoLayout(p.nodes, p.edges), updatedAt: Date.now() }));
@@ -902,11 +902,11 @@ export function CanvasStudio({
 								currentAction:
 									comment && comment.trim()
 										? decision === "approve"
-											? `人工审查批准合流：${comment.trim().slice(0, 500)}`
-											: `人工驳回：${comment.trim().slice(0, 500)}`
+											? `Approved: ${comment.trim().slice(0, 500)}`
+											: `Rejected: ${comment.trim().slice(0, 500)}`
 										: decision === "approve"
-											? "人工审查批准合流"
-											: "人工驳回：需补充完善测试与注释",
+											? "Approved by human review"
+											: "Rejected: needs more tests and docs",
 							}
 						: n,
 				),
@@ -978,7 +978,7 @@ export function CanvasStudio({
 				return;
 			}
 
-			// Escape → 取消连线拉取 / 关闭抽屉 / 取消选中
+			// Escape → Cancel连线拉取 / Close抽屉 / Cancel选中
 			if (e.key === "Escape") {
 				if (connectingSource) {
 					setConnectingSource(null);
@@ -1119,7 +1119,7 @@ export function CanvasStudio({
 			</div>
 
 			{/* 空画布引导状态 */}
-			{/* 左下统一底座：AI 生成 + 导入导出 */}
+			{/* 左下统一底座：AI 生成 + Import导出 */}
 			<div className="canvas-dock">
 				<CanvasAiBar
 					onApply={handleApplyTemplate}
@@ -1131,7 +1131,7 @@ export function CanvasStudio({
 				{smartDag && !smartDag.error && (
 					<div className="canvas-smart-banner">
 						<span>
-							🤖 AI 已生成 {smartDag.graph.nodes.length} 节点 / {smartDag.graph.edges.length} 条边，确认落图？
+							🤖 AI generated {smartDag.graph.nodes.length} nodes / {smartDag.graph.edges.length} edges. Apply to canvas?
 						</span>
 						<button
 							type="button"
@@ -1141,62 +1141,62 @@ export function CanvasStudio({
 								setSmartDag(null);
 							}}
 						>
-							应用到画布
+							Apply to Canvas
 						</button>
 						<button type="button" className="canvas-btn" onClick={() => setSmartDag(null)}>
-							丢弃
+							Discard
 						</button>
 					</div>
 				)}
 				{smartDag?.error && (
 					<div className="canvas-smart-banner error">
-						<span>AI 返回的 DAG 校验失败：{smartDag.error}，已保留当前画布。</span>
+						<span>AI returned an invalid DAG: {smartDag.error}; the current canvas was kept.</span>
 						<button type="button" className="canvas-btn" onClick={() => setSmartDag(null)}>
-							关闭
+							Close
 						</button>
 					</div>
 				)}
 				<div className="canvas-export-bar">
-					<button type="button" className="canvas-dock-btn" onClick={handleExportPNG} title="导出当前画布为 PNG">
+					<button type="button" className="canvas-dock-btn" onClick={handleExportPNG} title="Export canvas as PNG">
 						PNG
 					</button>
-					<button type="button" className="canvas-dock-btn" onClick={handleExportJSON} title="导出为 JSON 备份">
+					<button type="button" className="canvas-dock-btn" onClick={handleExportJSON} title="Export as JSON backup">
 						JSON
 					</button>
-					<button type="button" className="canvas-dock-btn" onClick={handleImportJSON} title="从 JSON 导入">
-						导入
+					<button type="button" className="canvas-dock-btn" onClick={handleImportJSON} title="Import from JSON">
+						Import
 					</button>
 				</div>
 			</div>
 			{graph.nodes.length === 0 && (
 				<div className="canvas-empty-state">
 					<div className="canvas-empty-icon">🎨</div>
-					<h3 className="canvas-empty-title">画布是空的</h3>
-					<p className="canvas-empty-desc">添加数字员工或加载一个战队模板来开始协作</p>
+					<h3 className="canvas-empty-title">Canvas is empty</h3>
+					<p className="canvas-empty-desc">Add an agent or load a team template to start collaborating</p>
 					<div className="canvas-empty-actions">
 						<button type="button" className="canvas-btn primary" onClick={() => handleAddNode("coder")}>
-							<FiPlus /> 添加第一个队友
+							<FiPlus /> Add First Agent
 						</button>
 						<button
 							type="button"
 							className="canvas-btn"
 							onClick={() => handleApplyTemplate(SQUAD_TEMPLATES[0].createGraph())}
 						>
-							<FiUsers /> 快速加载模板
+							<FiUsers /> Load Template
 						</button>
 					</div>
 					<div className="canvas-empty-shortcuts">
 						<span>
-							<kbd>Ctrl+S</kbd> 保存
+							<kbd>Ctrl+S</kbd> Save
 						</span>
 						<span>
-							<kbd>Ctrl+0</kbd> 适配视图
+							<kbd>Ctrl+0</kbd> Fit View
 						</span>
 						<span>
-							<kbd>Delete</kbd> 删除选中
+							<kbd>Delete</kbd> Delete Selection
 						</span>
 						<span>
-							<kbd>Esc</kbd> 取消选择
+							<kbd>Esc</kbd> Deselect
 						</span>
 					</div>
 				</div>
@@ -1207,9 +1207,9 @@ export function CanvasStudio({
 					type="button"
 					className="canvas-timeline-toggle"
 					onClick={() => setShowTimeline((v) => !v)}
-					title="执行时间线 / 失败重试"
+					title="Execution timeline / retry failures"
 				>
-					{showTimeline ? "⏱ 收起" : "⏱ 时间线"}
+					{showTimeline ? "⏱ Collapse" : "⏱ Timeline"}
 				</button>
 			)}
 			{showTimeline && (
@@ -1227,7 +1227,7 @@ export function CanvasStudio({
 
 			{/* P0 小地图：节点分布缩略 + 点击定位 */}
 			{graph.nodes.length > 0 && (
-				<div className="canvas-minimap" title="小地图">
+				<div className="canvas-minimap" title="Minimap">
 					{graph.nodes.map((n) => (
 						<button
 							key={n.id}

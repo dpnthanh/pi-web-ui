@@ -95,7 +95,7 @@ export function CanvasToolbar({
 	const renameInputRef = useRef<HTMLInputElement>(null);
 	const createInputRef = useRef<HTMLInputElement>(null);
 
-	// 点击外部关闭下拉菜单
+	// 点击外部Close下拉菜单
 	useEffect(() => {
 		if (!showSquadMenu && !showGraphMenu && !showNodeMenu) return;
 		const handleClick = (e: MouseEvent) => {
@@ -147,7 +147,7 @@ export function CanvasToolbar({
 
 	const handleDeleteCurrentGraph = () => {
 		if (graphList.length <= 1) return; // 至少保留一个工程
-		const confirmed = window.confirm(`确定要删除画布工程「${graph.name}」吗？\n此操作不可撤销。`);
+		const confirmed = window.confirm(`Delete canvas project "${graph.name}"?\nThis cannot be undone.`);
 		if (confirmed) {
 			onDeleteGraph(graph.id);
 		}
@@ -170,18 +170,18 @@ export function CanvasToolbar({
 							else if (e.key === "Escape") setRenamingGraph(false);
 						}}
 						onBlur={handleRenameSubmit}
-						placeholder="工程名称"
+						placeholder="Project name"
 					/>
 				) : (
 					<select
 						className="canvas-toolbar-select"
 						value={graph.id}
 						onChange={(e) => onSelectGraph(e.target.value)}
-						title="切换画布工程"
+						title="Switch canvas project"
 					>
 						{graphList.map((g) => (
 							<option key={g.id} value={g.id}>
-								{g.name} ({g.nodeCount}人)
+								{g.name} ({g.nodeCount})
 							</option>
 						))}
 					</select>
@@ -192,7 +192,7 @@ export function CanvasToolbar({
 						type="button"
 						className="canvas-toolbar-btn"
 						onClick={() => setShowGraphMenu(!showGraphMenu)}
-						title="工程管理菜单"
+						title="Project menu"
 					>
 						▾
 					</button>
@@ -218,7 +218,7 @@ export function CanvasToolbar({
 												setCreatingGraph(false);
 											}
 										}}
-										placeholder="输入新工程名称..."
+										placeholder="New project name..."
 										onClick={(e) => e.stopPropagation()}
 									/>
 									<button
@@ -236,9 +236,9 @@ export function CanvasToolbar({
 							) : (
 								<button type="button" className="canvas-dropdown-item" onClick={() => setCreatingGraph(true)}>
 									<b>
-										<FiFilePlus style={{ verticalAlign: "middle" }} /> 新建画布工程
+										<FiFilePlus style={{ verticalAlign: "middle" }} /> New Canvas Project
 									</b>
-									<small>创建一个全新的空白画布</small>
+									<small>Create a fresh blank canvas</small>
 								</button>
 							)}
 							<button
@@ -251,9 +251,9 @@ export function CanvasToolbar({
 								}}
 							>
 								<b>
-									<FiEdit3 style={{ verticalAlign: "middle" }} /> 重命名当前工程
+									<FiEdit3 style={{ verticalAlign: "middle" }} /> Rename Project
 								</b>
-								<small>修改「{graph.name}」的名称</small>
+								<small>Rename "{graph.name}"</small>
 							</button>
 							<button
 								type="button"
@@ -263,12 +263,12 @@ export function CanvasToolbar({
 									setShowGraphMenu(false);
 								}}
 								disabled={graphList.length <= 1}
-								title={graphList.length <= 1 ? "至少需保留一个画布工程" : ""}
+								title={graphList.length <= 1 ? "At least one canvas project must remain" : ""}
 							>
 								<b>
-									<FiTrash2 style={{ verticalAlign: "middle" }} /> 删除当前工程
+									<FiTrash2 style={{ verticalAlign: "middle" }} /> Delete Project
 								</b>
-								<small>{graphList.length <= 1 ? "仅剩一个工程，无法删除" : `永久删除「${graph.name}」`}</small>
+								<small>{graphList.length <= 1 ? "Only one project left; cannot delete" : `Permanently delete "${graph.name}」`}</small>
 							</button>
 						</div>
 					)}
@@ -278,7 +278,7 @@ export function CanvasToolbar({
 					type="button"
 					className={`canvas-toolbar-btn ${hasUnsavedChanges ? "canvas-unsaved" : ""}`}
 					onClick={onSave}
-					title={hasUnsavedChanges ? "有未保存的更改 (Ctrl+S)" : "保存当前工程 (Ctrl+S)"}
+					title={hasUnsavedChanges ? "Unsaved changes (Ctrl+S)" : "Save project (Ctrl+S)"}
 				>
 					<FiSave />
 				</button>
@@ -292,9 +292,9 @@ export function CanvasToolbar({
 					type="button"
 					className="canvas-toolbar-btn primary"
 					onClick={() => onAddNode("coder")}
-					title="快速新增一个研发工程师节点，更多类型请点右侧节点库"
+					title="Quick-add a coder node; more types in the node library →"
 				>
-					<FiPlus /> 新增队友
+					<FiPlus /> Add Agent
 				</button>
 
 				<div className="canvas-dropdown-wrap" ref={nodeMenuRef}>
@@ -302,9 +302,9 @@ export function CanvasToolbar({
 						type="button"
 						className="canvas-toolbar-btn"
 						onClick={() => setShowNodeMenu(!showNodeMenu)}
-						title="通用节点库：触发 / 智能体 / 逻辑控制 / 工具数据 / 评估收尾（对标 LangGraph / n8n / Dify）"
+						title="Node library: triggers / agents / logic / tools & data / evaluate & finish (LangGraph / n8n / Dify style)"
 					>
-						节点库 ▾
+						Nodes ▾
 					</button>
 
 					{showNodeMenu && (
@@ -316,7 +316,7 @@ export function CanvasToolbar({
 						>
 							{customCards.length > 0 && (
 								<div className="canvas-palette-group">
-									<div className="canvas-palette-group-title">自定义卡片（{customCards.length}）</div>
+									<div className="canvas-palette-group-title">Custom cards ({customCards.length})</div>
 									{customCards.map((c) => (
 										<div
 											key={c.id}
@@ -339,7 +339,7 @@ export function CanvasToolbar({
 												type="button"
 												className="canvas-toolbar-btn"
 												onClick={() => onDeleteCard?.(c.id)}
-												title={"删除卡片 " + c.title}
+												title={"Delete card " + c.title}
 											>
 												×
 											</button>
@@ -381,9 +381,9 @@ export function CanvasToolbar({
 						type="button"
 						className="canvas-toolbar-btn"
 						onClick={() => setShowSquadMenu(!showSquadMenu)}
-						title="加载官方开箱即用战队模板"
+						title="Load an official ready-made team template"
 					>
-						<FiUsers /> 战队模板 ▾
+						<FiUsers /> Templates ▾
 					</button>
 
 					{showSquadMenu && (
@@ -417,17 +417,17 @@ export function CanvasToolbar({
 			{/* 全图调度控制 */}
 			<div className="canvas-toolbar-group">
 				{graph.status === "running" ? (
-					<button type="button" className="canvas-toolbar-btn stop" onClick={onStopAll} title="全部停止">
-						<FiSquare /> 全部停止
+					<button type="button" className="canvas-toolbar-btn stop" onClick={onStopAll} title="Stop all">
+						<FiSquare /> Stop All
 					</button>
 				) : (
-					<button type="button" className="canvas-toolbar-btn run" onClick={onRunAll} title="启动全队流水线">
-						<FiPlay /> 启动流水线
+					<button type="button" className="canvas-toolbar-btn run" onClick={onRunAll} title="Run the whole pipeline">
+						<FiPlay /> Run Pipeline
 					</button>
 				)}
 
-				<button type="button" className="canvas-toolbar-btn" onClick={onResetStatus} title="重置全队状态为待命 (idle)">
-					<FiRotateCcw /> 复位
+				<button type="button" className="canvas-toolbar-btn" onClick={onResetStatus} title="Reset all node statuses to idle">
+					<FiRotateCcw /> Reset
 				</button>
 			</div>
 
@@ -439,7 +439,7 @@ export function CanvasToolbar({
 					className="canvas-toolbar-btn"
 					onClick={onUndo}
 					disabled={canUndo === false}
-					title="撤销 (Ctrl+Z)"
+					title="Undo (Ctrl+Z)"
 				>
 					↩
 				</button>
@@ -448,14 +448,14 @@ export function CanvasToolbar({
 					className="canvas-toolbar-btn"
 					onClick={onRedo}
 					disabled={canRedo === false}
-					title="重做 (Ctrl+Shift+Z / Ctrl+Y)"
+					title="Redo (Ctrl+Shift+Z / Ctrl+Y)"
 				>
 					↪
 				</button>
-				<button type="button" className="canvas-toolbar-btn" onClick={onDuplicate} title="复制选中节点 (Ctrl+D)">
+				<button type="button" className="canvas-toolbar-btn" onClick={onDuplicate} title="Duplicate selected node (Ctrl+D)">
 					⧉
 				</button>
-				<button type="button" className="canvas-toolbar-btn" onClick={onAutoLayout} title="一键自动布局">
+				<button type="button" className="canvas-toolbar-btn" onClick={onAutoLayout} title="Auto-layout">
 					⛶
 				</button>
 			</div>
@@ -468,22 +468,22 @@ export function CanvasToolbar({
 					type="button"
 					className="canvas-toolbar-btn"
 					onClick={() => onZoomChange(Math.max(zoom - 0.15, 0.25))}
-					title="缩小"
+					title="Zoom out"
 				>
 					<FiZoomOut />
 				</button>
-				<button type="button" className="canvas-toolbar-btn" onClick={onResetViewport} title="恢复 100% 居中视图">
+				<button type="button" className="canvas-toolbar-btn" onClick={onResetViewport} title="Reset to 100% centered view">
 					<FiMaximize2 /> {Math.round(zoom * 100)}%
 				</button>
 				<button
 					type="button"
 					className="canvas-toolbar-btn"
 					onClick={() => onZoomChange(Math.min(zoom + 0.15, 2.0))}
-					title="放大"
+					title="Zoom in"
 				>
 					<FiZoomIn />
 				</button>
-				<button type="button" className="canvas-toolbar-btn" onClick={onFitView} title="适配所有节点到视口 (Ctrl+0)">
+				<button type="button" className="canvas-toolbar-btn" onClick={onFitView} title="Fit all nodes to the viewport (Ctrl+0)">
 					<FiTarget />
 				</button>
 			</div>

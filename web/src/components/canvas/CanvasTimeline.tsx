@@ -38,9 +38,9 @@ export function CanvasTimeline({ nodes, edges, logs, onRunNode, onLocate }: Prop
 	return (
 		<div className="canvas-timeline">
 			<div className="canvas-timeline-head">
-				<b>执行时间线</b>
+				<b>Execution Timeline</b>
 				<span className="canvas-timeline-meta">
-					{nodes.length}节点 · {failed.length}失败 · {rows.reduce((a, r) => a + r.count, 0)}条日志
+					{nodes.length} nodes · {failed.length} failed · {rows.reduce((a, r) => a + r.count, 0)} logs
 				</span>
 				{failed.length > 0 && (
 					<button
@@ -48,7 +48,7 @@ export function CanvasTimeline({ nodes, edges, logs, onRunNode, onLocate }: Prop
 						className="canvas-btn primary"
 						onClick={() => failed.forEach((r) => onRunNode(r.node.id))}
 					>
-						重试全部失败 ({failed.length})
+						Retry All Failed ({failed.length})
 					</button>
 				)}
 			</div>
@@ -60,14 +60,14 @@ export function CanvasTimeline({ nodes, edges, logs, onRunNode, onLocate }: Prop
 							type="button"
 							className="canvas-timeline-title"
 							onClick={() => onLocate(r.node.id)}
-							title="定位到节点"
+							title="Locate node"
 						>
 							{r.node.title}
 						</button>
 						<span className="canvas-timeline-sub">
 							{r.node.status}
-							{r.loops > 0 ? ` · 循环${r.loops}轮` : ""}
-							{r.count > 0 ? ` · ${r.count}条` : " · 无日志"}
+							{r.loops > 0 ? ` · ${r.loops} loops` : ""}
+							{r.count > 0 ? ` · ${r.count} logs` : " · no logs"}
 							{r.dur != null ? ` · ${fmtDur(r.dur)}` : ""}
 							{r.start != null ? ` · ${fmtTime(r.start)}` : ""}
 						</span>
@@ -76,14 +76,14 @@ export function CanvasTimeline({ nodes, edges, logs, onRunNode, onLocate }: Prop
 								type="button"
 								className="canvas-btn"
 								onClick={() => onRunNode(r.node.id)}
-								title={r.lastErr || "重试该节点"}
+								title={r.lastErr || "Retry this node"}
 							>
-								重试
+								Retry
 							</button>
 						)}
 					</div>
 				))}
-				{rows.length === 0 && <div className="canvas-timeline-empty">暂无节点</div>}
+				{rows.length === 0 && <div className="canvas-timeline-empty">No nodes yet</div>}
 			</div>
 		</div>
 	);
