@@ -40,6 +40,10 @@ RUN npm i -g @deepseek-ai/dsh@0.1.1-rc.2
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/web/dist ./web/dist
+# getPkgRoot() locates the package root by walking up to a package.json named
+# "pi-web-ui" — without it the frontend (web/dist) and themes never resolve
+# and / answers "Cannot GET /".
+COPY package.json ./
 ENV PI_WEB_PORT=8787
 # 数据目录必须指向挂载卷：默认 homedir(~/.pi-web) 落在容器可写层，
 # docker compose down 即丢失全部会话与设置。compose 已挂 pi-web-data:/app/.pi-web。
